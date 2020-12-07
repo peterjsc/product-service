@@ -1,0 +1,4 @@
+FROM mongo
+
+COPY initProduct.json /initProduct.json
+CMD mongoimport --host mongodb --db products --collection product --file /initProduct.json --jsonArray --authenticationDatabase admin -u root -p example 
