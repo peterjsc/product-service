@@ -10,6 +10,8 @@ const (
 	ProductNotFound       = "Product doesn't exist"
 	InvalidProductRequest = "Invalid Request no Product supplied"
 	InvalidOrderItem      = "Invalid Request no Item orders supplied, please supply value for 'ordered' parameter"
+	InvalidOrderNum       = "Please supply an order amount greater than 0"
+	ErrConvertingInt      = "Error converting string to int"
 )
 
 type RequestError struct {
@@ -28,6 +30,10 @@ func EncodeError(_ context.Context, err string, w http.ResponseWriter) {
 	case InvalidProductRequest:
 		w.WriteHeader(http.StatusBadRequest)
 	case InvalidOrderItem:
+		w.WriteHeader(http.StatusBadRequest)
+	case InvalidOrderNum:
+		w.WriteHeader(http.StatusBadRequest)
+	case ErrConvertingInt:
 		w.WriteHeader(http.StatusBadRequest)
 	default:
 		w.WriteHeader(http.StatusInternalServerError)

@@ -46,7 +46,12 @@ func (*service) ValidateOrder(orderAmount string) (int, error) {
 
 	itemsOrders, err := strconv.Atoi(orderAmount)
 	if err != nil {
-		err := errors.New("Error converting string to int")
+		err := errors.New(application.ErrConvertingInt)
+		return 0, err
+	}
+
+	if itemsOrders == 0 {
+		err := errors.New(application.InvalidOrderNum)
 		return 0, err
 	}
 
