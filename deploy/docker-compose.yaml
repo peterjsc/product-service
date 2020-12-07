@@ -7,7 +7,7 @@ services:
       container_name: productservice
       environment: 
         - DATABASE_ENDPOINT=mongodb://mongo:27017
-        - DATABASE_NAME=news-feed
+        - DATABASE_NAME=products
         - DATABASE_USER=root
         - DATABASE_PASS=example
       ports:

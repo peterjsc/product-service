@@ -1,6 +1,6 @@
 [
     {
-        "product": "socks",
+        "product-name": "socks",
         "item-packs": [
             250,
             500,
@@ -10,7 +10,7 @@
         ]
     },
     {
-        "product": "t-shirts",
+        "product-name": "t-shirts",
         "item-packs": [
             250,
             500,

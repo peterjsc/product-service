@@ -2,43 +2,38 @@ package calculate
 
 import (
 	"fmt"
+	"gymshark-interview/internal/application"
 	"sort"
 )
 
-var (
-	item_stock = map[int]string{
-		5000: "5000 Items",
-		2000: "2000 Items",
-		1000: "1000 Items",
-		500:  "500 Items",
-		250:  "250 Items",
-	}
-)
+func CalcItemsWanted(itemsOrdered int, itemPacks []int) []application.ItemPacksOrder {
 
-func itemsWanted(itemsOrdered int) []string {
+	sort.Sort(sort.Reverse(sort.IntSlice(itemPacks)))
 
-	packsArr := intArr(item_stock)
+	packs := calculatePacks(itemsOrdered, itemPacks)
 
-	sort.Sort(sort.Reverse(sort.IntSlice(packsArr)))
+	total := sum(packs, itemPacks)
 
-	packs := calculatePacks(itemsOrdered, packsArr)
+	packs = calculatePacks(total, itemPacks)
 
-	total := sum(packs, packsArr)
-
-	packs = calculatePacks(total, packsArr)
-
-	chosenPacks := formatPacks(packs, packsArr)
+	chosenPacks := makeItemsOrdered(packs, itemPacks)
 
 	return chosenPacks
 }
 
-func formatPacks(packs []int, packsArr []int) []string {
-	packsChosen := []string{}
+func makeItemsOrdered(packs []int, packsArr []int) []application.ItemPacksOrder {
+
+	var packsChosen []application.ItemPacksOrder
 	fmt.Println(packs)
 	for i, count := range packs {
 		if count != 0 {
-			packs := fmt.Sprintf("%v Items x %v", packsArr[i], count)
-			packsChosen = append(packsChosen, packs)
+
+			packs := fmt.Sprintf("%v Items", packsArr[i])
+			packOrder := application.ItemPacksOrder{ItemPack: packs,
+				NumberItemPack: count,
+			}
+
+			packsChosen = append(packsChosen, packOrder)
 		}
 	}
 	return packsChosen
@@ -63,24 +58,6 @@ func calculatePacks(itemsOrdered int, packsArr []int) []int {
 	}
 
 	return orderArr
-}
-
-func minItem(arr []int) int {
-	smallest := arr[0]
-	for _, val := range arr {
-		if val <= smallest {
-			smallest = val
-		}
-	}
-	return smallest
-}
-
-func intArr(item_stock map[int]string) []int {
-	packsArr := []int{}
-	for key, _ := range item_stock {
-		packsArr = append(packsArr, key)
-	}
-	return packsArr
 }
 
 func sum(packs []int, packsArr []int) int {
