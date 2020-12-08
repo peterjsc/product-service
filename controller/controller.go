@@ -3,11 +3,13 @@ package controller
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"gymshark-interview/internal/application"
 	"net/http"
 
 	"gymshark-interview/service"
 
+	"github.com/golang/gddo/httputil/header"
 	"github.com/gorilla/mux"
 )
 
@@ -23,6 +25,7 @@ var (
 
 type ProductController interface {
 	GetItemsOrdered(response http.ResponseWriter, request *http.Request)
+	PostProduct(response http.ResponseWriter, request *http.Request)
 }
 
 func NewProductController() ProductController {
@@ -53,7 +56,7 @@ func (*controller) GetItemsOrdered(response http.ResponseWriter, request *http.R
 	}
 
 	req := application.GetItemOrderRequest{
-		ProductID:    product,
+		ProductName:  product,
 		ItemsOrdered: orderAmount,
 	}
 
@@ -64,4 +67,42 @@ func (*controller) GetItemsOrdered(response http.ResponseWriter, request *http.R
 	}
 
 	json.NewEncoder(response).Encode(newsArticles)
+}
+
+func (*controller) PostProduct(response http.ResponseWriter, request *http.Request) {
+
+	if request.Header.Get("Content-Type") == "" {
+		value, _ := header.ParseValueAndParams(request.Header, "Content-Type")
+		if value != "application/json" {
+			msg := "Content-Type header is not application/json"
+			application.EncodeError(ctx, msg, response)
+			return
+		}
+	}
+
+	v := mux.Vars(request)
+
+	product := &application.Product{
+		ProductName: v["product"],
+	}
+
+	err := json.NewDecoder(request.Body).Decode(&product)
+	if err != nil {
+		application.EncodeError(ctx, application.InvalidRequestBody, response)
+		return
+	}
+
+	prodRequest := application.PostProductRequest{
+		Product: product,
+	}
+
+	respErr := psrv.PostProduct(ctx, prodRequest)
+	if respErr != nil {
+		application.EncodeError(ctx, respErr.Error(), response)
+		return
+	}
+
+	response.Header().Set("Content-Type", "application/json; charset=utf-8")
+
+	fmt.Fprintf(response, "Product is now created")
 }

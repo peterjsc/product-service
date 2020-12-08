@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"gymshark-interview/internal/application"
 	"gymshark-interview/internal/pkg/mongo/database"
 	"gymshark-interview/repository"
@@ -20,6 +21,7 @@ type ProductService interface {
 	ValidateProduct(product string) error
 	ValidateOrder(orderAmount string) (int, error)
 	GetProductOrdered(ctx context.Context, request application.GetItemOrderRequest) (*application.GetItemOrderResponse, error)
+	PostProduct(ctx context.Context, request application.PostProductRequest) error
 }
 
 var (
@@ -60,9 +62,22 @@ func (*service) ValidateOrder(orderAmount string) (int, error) {
 
 func (*service) GetProductOrdered(ctx context.Context, request application.GetItemOrderRequest) (*application.GetItemOrderResponse, error) {
 
-	prodOrder, err := prodRepo.GetProductOrdered(ctx, request.ProductID, request.ItemsOrdered)
+	prodOrder, err := prodRepo.GetProductOrdered(ctx, request.ProductName, request.ItemsOrdered)
 	if err != nil {
 		return nil, err
 	}
 	return &application.GetItemOrderResponse{ProductOrdered: prodOrder}, nil
+}
+
+func (*service) PostProduct(ctx context.Context, request application.PostProductRequest) error {
+
+	fmt.Println(request.Product.ProductName)
+	fmt.Println(request.Product.ItemPacks)
+
+	err := prodRepo.CreateProduct(ctx, request.Product)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

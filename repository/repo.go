@@ -21,6 +21,7 @@ const (
 
 type ProductRepository interface {
 	GetProductOrdered(ctx context.Context, productID string, itemsOrdered int) (*application.OrderedItems, error)
+	CreateProduct(ctx context.Context, product *application.Product) error
 }
 
 func NewProductRepository(ctx context.Context, db database.DBFramework) ProductRepository {
@@ -53,4 +54,9 @@ func (pr *Repository) GetProductOrdered(ctx context.Context, productID string, i
 	}
 
 	return orderInfo, nil
+}
+
+func (pr *Repository) CreateProduct(ctx context.Context, product *application.Product) error {
+
+	return nil
 }

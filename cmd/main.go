@@ -17,6 +17,7 @@ func main() {
 	prodController := controller.NewProductController()
 
 	httpRouter.HandleFunc("/products/{product}", prodController.GetItemsOrdered).Methods("GET")
+	httpRouter.HandleFunc("/products/{product}", prodController.PostProduct).Methods("POST")
 
 	http.ListenAndServe(defaultHTTPPort, httpRouter)
 }
