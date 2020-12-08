@@ -4,12 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"gymshark-interview/internal/application"
 	"net/http"
+	"product-service/internal/application"
 
-	"gymshark-interview/service"
+	"product-service/service"
 
-	"github.com/golang/gddo/httputil/header"
 	"github.com/gorilla/mux"
 )
 
@@ -72,12 +71,9 @@ func (*controller) GetItemsOrdered(response http.ResponseWriter, request *http.R
 func (*controller) PostProduct(response http.ResponseWriter, request *http.Request) {
 
 	if request.Header.Get("Content-Type") == "" {
-		value, _ := header.ParseValueAndParams(request.Header, "Content-Type")
-		if value != "application/json" {
-			msg := "Content-Type header is not application/json"
-			application.EncodeError(ctx, msg, response)
-			return
-		}
+		msg := "Content-Type header is not application/json"
+		application.EncodeError(ctx, msg, response)
+		return
 	}
 
 	v := mux.Vars(request)
@@ -88,6 +84,11 @@ func (*controller) PostProduct(response http.ResponseWriter, request *http.Reque
 
 	err := json.NewDecoder(request.Body).Decode(&product)
 	if err != nil {
+		application.EncodeError(ctx, application.InvalidRequestBody, response)
+		return
+	}
+
+	if product.ItemPacks == nil {
 		application.EncodeError(ctx, application.InvalidRequestBody, response)
 		return
 	}
@@ -103,6 +104,7 @@ func (*controller) PostProduct(response http.ResponseWriter, request *http.Reque
 	}
 
 	response.Header().Set("Content-Type", "application/json; charset=utf-8")
+	response.WriteHeader(http.StatusCreated)
 
 	fmt.Fprintf(response, "Product is now created")
 }

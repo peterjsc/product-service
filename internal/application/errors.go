@@ -13,7 +13,8 @@ const (
 	InvalidOrderNum       = "Please supply an order amount greater than 0"
 	ErrConvertingInt      = "Error converting string to int"
 	ContentTypeError      = "Content-Type header is not application/json"
-	InvalidRequestBody    = "Please supply a body in json for request"
+	InvalidRequestBody    = "Please supply a body in json for request or in correct format"
+	ProductDuplicate      = "Product already exists"
 )
 
 type RequestError struct {
@@ -29,18 +30,12 @@ func EncodeError(_ context.Context, err string, w http.ResponseWriter) {
 	switch err {
 	case ProductNotFound:
 		w.WriteHeader(http.StatusNotFound)
-	case InvalidProductRequest:
-		w.WriteHeader(http.StatusBadRequest)
-	case InvalidOrderItem:
-		w.WriteHeader(http.StatusBadRequest)
-	case InvalidOrderNum:
-		w.WriteHeader(http.StatusBadRequest)
-	case ErrConvertingInt:
+	case InvalidProductRequest, InvalidOrderItem, InvalidOrderNum, ErrConvertingInt, InvalidRequestBody:
 		w.WriteHeader(http.StatusBadRequest)
 	case ContentTypeError:
 		w.WriteHeader(http.StatusUnsupportedMediaType)
-	case InvalidRequestBody:
-		w.WriteHeader(http.StatusBadRequest)
+	case ProductDuplicate:
+		w.WriteHeader(http.StatusConflict)
 	default:
 		w.WriteHeader(http.StatusInternalServerError)
 	}

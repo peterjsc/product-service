@@ -3,10 +3,10 @@ package service
 import (
 	"context"
 	"errors"
-	"fmt"
-	"gymshark-interview/internal/application"
-	"gymshark-interview/internal/pkg/mongo/database"
-	"gymshark-interview/repository"
+	"product-service/calculate"
+	"product-service/internal/application"
+	"product-service/internal/pkg/mongo/database"
+	"product-service/repository"
 	"strconv"
 )
 
@@ -62,21 +62,32 @@ func (*service) ValidateOrder(orderAmount string) (int, error) {
 
 func (*service) GetProductOrdered(ctx context.Context, request application.GetItemOrderRequest) (*application.GetItemOrderResponse, error) {
 
-	prodOrder, err := prodRepo.GetProductOrdered(ctx, request.ProductName, request.ItemsOrdered)
+	prodOrder, err := prodRepo.GetProduct(ctx, request.ProductName)
 	if err != nil {
 		return nil, err
 	}
-	return &application.GetItemOrderResponse{ProductOrdered: prodOrder}, nil
+
+	orderedItems := calculate.CalcItemsWanted(request.ItemsOrdered, prodOrder.ItemPacks)
+
+	orderInfo := &application.OrderedItems{
+		ProductName: prodOrder.ProductName,
+		ItemPacks:   orderedItems,
+	}
+
+	return &application.GetItemOrderResponse{ProductOrdered: orderInfo}, nil
 }
 
 func (*service) PostProduct(ctx context.Context, request application.PostProductRequest) error {
 
-	fmt.Println(request.Product.ProductName)
-	fmt.Println(request.Product.ItemPacks)
-
-	err := prodRepo.CreateProduct(ctx, request.Product)
-	if err != nil {
+	prodOrder, _ := prodRepo.GetProduct(ctx, request.Product.ProductName)
+	if prodOrder != nil {
+		err := errors.New(application.ProductDuplicate)
 		return err
+	}
+
+	addErr := prodRepo.CreateProduct(ctx, request.Product)
+	if addErr != nil {
+		return addErr
 	}
 
 	return nil

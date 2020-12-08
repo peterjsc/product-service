@@ -1,7 +1,7 @@
 package calculate
 
 import (
-	"gymshark-interview/internal/application"
+	"product-service/internal/application"
 	"reflect"
 	"testing"
 )

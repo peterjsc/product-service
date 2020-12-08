@@ -2,7 +2,7 @@ package calculate
 
 import (
 	"fmt"
-	"gymshark-interview/internal/application"
+	"product-service/internal/application"
 	"sort"
 )
 

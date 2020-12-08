@@ -1,8 +1,8 @@
 package main
 
 import (
-	"gymshark-interview/controller"
 	"net/http"
+	"product-service/controller"
 
 	"github.com/gorilla/mux"
 )

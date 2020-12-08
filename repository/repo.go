@@ -3,9 +3,9 @@ package repository
 import (
 	"context"
 	"errors"
-	"gymshark-interview/calculate"
-	"gymshark-interview/internal/application"
-	"gymshark-interview/internal/pkg/mongo/database"
+	"fmt"
+	"product-service/internal/application"
+	"product-service/internal/pkg/mongo/database"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -20,7 +20,7 @@ const (
 )
 
 type ProductRepository interface {
-	GetProductOrdered(ctx context.Context, productID string, itemsOrdered int) (*application.OrderedItems, error)
+	GetProduct(ctx context.Context, productID string) (*application.Product, error)
 	CreateProduct(ctx context.Context, product *application.Product) error
 }
 
@@ -30,7 +30,7 @@ func NewProductRepository(ctx context.Context, db database.DBFramework) ProductR
 	return &Repository{dbCol: collection}
 }
 
-func (pr *Repository) GetProductOrdered(ctx context.Context, productID string, itemsOrdered int) (*application.OrderedItems, error) {
+func (pr *Repository) GetProduct(ctx context.Context, productID string) (*application.Product, error) {
 
 	filter := bson.M{
 		"product-name": productID,
@@ -41,22 +41,25 @@ func (pr *Repository) GetProductOrdered(ctx context.Context, productID string, i
 	resErr := pr.dbCol.FindOne(context.TODO(), filter).Decode(&product)
 	if resErr != nil {
 		if resErr == mongo.ErrNoDocuments {
-			return &application.OrderedItems{}, errors.New(application.ProductNotFound)
+			return nil, errors.New(application.ProductNotFound)
 		}
-		return &application.OrderedItems{}, resErr
+		return nil, resErr
 	}
 
-	orderedItems := calculate.CalcItemsWanted(itemsOrdered, product.ItemPacks)
-
-	orderInfo := &application.OrderedItems{
-		ProductName: product.ProductName,
-		ItemPacks:   orderedItems,
-	}
-
-	return orderInfo, nil
+	return product, nil
 }
 
 func (pr *Repository) CreateProduct(ctx context.Context, product *application.Product) error {
 
+	addProduct := bson.M{
+		"product-name": product.ProductName,
+		"item-packs":   product.ItemPacks,
+	}
+
+	productResult, err := pr.dbCol.InsertOne(ctx, addProduct)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Inserted %v documents into episode collection!\n", productResult.InsertedID)
 	return nil
 }

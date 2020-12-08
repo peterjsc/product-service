@@ -41,6 +41,9 @@ Allows for a user to specify a 'Product' along with the 'ordered' amount they wa
 
 ----
 
+**Get Product item pack endpoint**
+
+* Endpoint used to recieve and calcuate item packs for a given product and item ordered amount
 * **URL:**
     /products/{product-name}
     * Example url `http://localhost:8080/products/socks?ordered=501`
@@ -69,3 +72,56 @@ Allows for a user to specify a 'Product' along with the 'ordered' amount they wa
   * Error occurs when 0 is supplied for the 'ordered' url param 
   * **Code:** 400 Bad Request <br />
     **Content:** `{"error": "Please supply an order amount greater than 0"}`
+  
+  * Error occurs if no parameter called 'ordered' is supplied or if it has no value 
+  * **Code:** 400 Bad Request <br />
+    **Content:** ` { "error": "Invalid Request no Item orders supplied, please supply value for 'ordered' parameter" }`
+
+----
+
+**Add Product endpoint**
+
+* Endpoint used to create a new product with item-packs, post url needs a header of content-type 'application/json' and a body for item-packs see example below of a post
+* **URL:**
+    /products/{product-name}
+    * Example url `http://localhost:8080/products/running-top`
+    * Header: `"Content-Type"="application/json; charset=utf-8"`
+    * Body: `{ "item-packs": [ 250, 500, 1000, 2000, 5000 ] }`
+
+* **Method:**
+    POST
+
+* **Success Response:**
+  * **Code:** 201 <br />
+    **Content:** `{ Product is now created }`
+
+* **Error Response:**
+
+  * Error if trying to add product that already exists
+  * **Code:** 409 Conflict <br />
+    **Content:** `{"error": "Product already exists"}`
+  
+  * Error if no content type is supplied in header or a request body
+  * **Code:** 415 Unsupported Media Type <br />
+    **Content:** `{ "error": "Content-Type header is not application/json" }`
+
+  * Error if content type is supplied in header but not body is supplied in the request or supplies an incorrect json body
+  * **Code:** 400 Bad Request <br />
+    **Content:** `{ "error": "Please supply a body in json for request or in correct format" }`
+
+
+## Useful Tips
+
+For accessing and querying the mongodb database here are a few useful commands 
+
+For connecting to the mongodb container using the following command:
+`docker exec -it mongodb bash`
+
+Then connect to the database using the credentials 
+`mongo admin -u root -p example`
+
+This shows the databases once connected `show dbs` and `use products` picks the database to work with.
+
+The `show collections` shows the collections withing that database, there will be a  collections `product` for product data.
+
+The following to commands can be used to bring back all the data in the product collections, `db.product.find()`
