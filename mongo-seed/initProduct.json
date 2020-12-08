@@ -1,0 +1,22 @@
+[
+    {
+        "product-name": "socks",
+        "item-packs": [
+            250,
+            500,
+            1000,
+            2000,
+            5000
+        ]
+    },
+    {
+        "product-name": "t-shirts",
+        "item-packs": [
+            250,
+            500,
+            1000,
+            2000,
+            5000
+        ]
+    }
+]

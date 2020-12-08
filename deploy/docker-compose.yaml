@@ -1,0 +1,31 @@
+version: "3.8"
+services:
+    productservice:
+      build: 
+        context: "../"
+        dockerfile: "./build/dockerfile"
+      container_name: productservice
+      environment: 
+        - DATABASE_ENDPOINT=mongodb://mongo:27017
+        - DATABASE_NAME=products
+        - DATABASE_USER=root
+        - DATABASE_PASS=example
+      ports:
+        - "8080:8080"
+      depends_on:
+       - mongo
+    
+    mongo:
+      image: mongo
+      container_name: "mongodb"
+      restart: always
+      environment:
+        MONGO_INITDB_ROOT_USERNAME: root
+        MONGO_INITDB_ROOT_PASSWORD: example
+      ports:
+        - "27017:27017"
+
+    mongo-seed:
+      build: ../mongo-seed
+      links:
+        - mongo
