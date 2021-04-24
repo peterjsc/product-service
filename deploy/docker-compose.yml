@@ -5,11 +5,8 @@ services:
         context: "../"
         dockerfile: "./build/dockerfile"
       container_name: productservice
-      environment: 
-        - DATABASE_ENDPOINT=mongodb://mongo:27017
-        - DATABASE_NAME=products
-        - DATABASE_USER=root
-        - DATABASE_PASS=example
+      env_file:
+        - ../local.env 
       ports:
         - "8080:8080"
       depends_on:
@@ -19,9 +16,8 @@ services:
       image: mongo
       container_name: "mongodb"
       restart: always
-      environment:
-        MONGO_INITDB_ROOT_USERNAME: root
-        MONGO_INITDB_ROOT_PASSWORD: example
+      env_file:
+        - ../local.env
       ports:
         - "27017:27017"
 
